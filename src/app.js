@@ -41,7 +41,8 @@ var params = {
   q: "#1917",
   count: 1,
   result_type: "recent",
-  lang: "en"
+  lang: "en",
+  tweet_mode: "extended"
 };
 
 T.get("search/tweets", params, function(err, data, response) {
@@ -54,7 +55,7 @@ T.get("search/tweets", params, function(err, data, response) {
     });
     console.log(
       "Rate Limit Remaining: " + response.headers["x-rate-limit-remaining"],
-      "Tweet: " + JSON.parse(response.body).statuses[0].text
+      "Tweet: " + JSON.parse(response.body).statuses[0].full_text
     );
   }
 });

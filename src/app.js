@@ -1,15 +1,16 @@
-const http = require("http");
-const Twitter = require("twitter");
-const MongoClient = require("mongodb").MongoClient;
-const credentials = require("../config");
-const fs = require("fs");
+import { createServer } from "http";
+import Twitter from "twitter";
+import { MongoClient } from "mongodb";
+import credentials from "../config";
+import { writeFile } from "fs";
+
 const url = "mongodb://localhost:27017/mydb";
 
 const hostname = "127.0.0.1";
 const port = 3000;
 
 //WEBSITE
-const server = http.createServer((req, res) => {
+const server = createServer((req, res) => {
   res.statusCode = 200;
   res.setHeader("Content-Type", "text/plain");
   res.end("Hello World");
@@ -46,7 +47,7 @@ var params = {
 T.get("search/tweets", params, function(err, data, response) {
   if (err) {
   } else {
-    fs.writeFile("response.json", JSON.stringify(response), function(err) {
+    writeFile("response.json", JSON.stringify(response), function(err) {
       if (err) {
         console.log(err);
       }

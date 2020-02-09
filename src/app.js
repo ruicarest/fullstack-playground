@@ -1,5 +1,7 @@
 const http = require("http");
 var MongoClient = require("mongodb").MongoClient;
+const credentials = require("../config");
+
 var url = "mongodb://localhost:27017/mydb";
 
 const hostname = "127.0.0.1";

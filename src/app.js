@@ -1,23 +1,46 @@
-import { createServer } from "http";
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
 import Twitter from "twitter";
 import { MongoClient } from "mongodb";
-import credentials from "../config";
 import { writeFile } from "fs";
+
+import credentials from "../config";
+
+import routes from "./routes";
 
 const url = "mongodb://localhost:27017/mydb";
 
-const hostname = "127.0.0.1";
-const port = 3000;
+const app = express();
 
-//WEBSITE
-const server = createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader("Content-Type", "text/plain");
-  res.end("Hello World");
+//Cross-origin resource sharing
+app.use(cors());
+
+//Parses the text as JSON and exposes the resulting object on req.body.
+app.use(express.json());
+//Parses the text as URL encoded data (which is how browsers tend to send form data from regular forms set to POST)
+//and exposes the resulting object (containing the keys and values) on req.body
+app.use(express.urlencoded({ extended: true }));
+
+app.listen(process.env.PORT, () =>
+  console.log(`App listening on port ${process.env.PORT}!`)
+);
+
+app.get("/user/", (req, res) => {
+  res.send("Hello World!");
 });
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+//Create
+app.post("/user/:userId", (req, res) => {
+  return res.send("Received a POST HTTP method");
+});
+
+//Update
+app.put("/", (req, res) => {
+  return res.send("Received a PUT HTTP method");
+});
+app.delete("/", (req, res) => {
+  return res.send("Received a DELETE HTTP method");
 });
 
 //DB

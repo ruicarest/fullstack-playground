@@ -1,3 +1,4 @@
+//this should go before other imports
 import "dotenv/config";
 
 // config.js

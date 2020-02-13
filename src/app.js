@@ -9,8 +9,6 @@ import credentials from "../config";
 
 import routes from "./routes";
 
-const url = "mongodb://localhost:27017/mydb";
-
 const app = express();
 
 //Cross-origin resource sharing
@@ -43,19 +41,6 @@ app.delete("/", (req, res) => {
   return res.send("Received a DELETE HTTP method");
 });
 
-//DB
-MongoClient.connect(url, function(err, db) {
-  if (err) throw err;
-  var dbo = db.db("mydb");
-  var myobj = [{ name: "John", address: "Highway 71" }];
-
-  dbo.collection("customers").insertMany(myobj, function(err, res) {
-    if (err) throw err;
-    console.log("Number of documents inserted: " + res.insertedCount, res);
-    db.close();
-  });
-});
-
 //TWITTER
 var T = new Twitter(credentials);
 
@@ -68,17 +53,40 @@ var params = {
   tweet_mode: "extended"
 };
 
+//POPULATE DB WITH NEW TWEET
 T.get("search/tweets", params, function(err, data, response) {
   if (err) {
   } else {
+    //save response for debugging purposes
     writeFile("response.json", JSON.stringify(response), function(err) {
       if (err) {
         console.log(err);
       }
     });
-    console.log(
-      "Rate Limit Remaining: " + response.headers["x-rate-limit-remaining"],
-      "Tweet: " + JSON.parse(response.body).statuses[0].full_text
+
+    //DB
+    MongoClient.connect(
+      process.env.DB_URL,
+      { useUnifiedTopology: true },
+      function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("mydb");
+        var myobj = [
+          {
+            LimitNumber: response.headers["x-rate-limit-remaining"],
+            TweetText: JSON.parse(response.body).statuses[0].full_text
+          }
+        ];
+
+        dbo.collection("tweets").insertMany(myobj, function(err, res) {
+          if (err) throw err;
+          console.log(
+            "Number of documents inserted: " + res.insertedCount,
+            res
+          );
+          db.close();
+        });
+      }
     );
   }
 });

@@ -25,7 +25,8 @@ app.listen(process.env.PORT, () =>
 );
 
 app.get("/user/", (req, res) => {
-  res.send("Hello World!");
+  console.log("Received GET /user/");
+  res.send(JSON.stringify("Hello World!"));
 });
 
 //Create

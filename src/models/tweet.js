@@ -12,7 +12,7 @@ const tweetSchema = new mongoose.Schema({
   }
 });
 
-tweetSchema.statics.findByLogin = async function() {
+tweetSchema.statics.findTweet = async function() {
   let tweet = await this.aggregate([{ $sample: { size: 1 } }]);
 
   // if (!tweet)

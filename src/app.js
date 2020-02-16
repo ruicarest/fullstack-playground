@@ -59,7 +59,7 @@ app.delete("/", (req, res) => {
   return res.send("Received a DELETE HTTP method");
 });
 
-const getTweets = (topic = "#1917", howMany = 1) => {
+const getTweetsFromTwitter = (topic = "#1917", howMany = 3) => {
   var params = {
     q: topic,
     count: howMany,
@@ -68,7 +68,6 @@ const getTweets = (topic = "#1917", howMany = 1) => {
     tweet_mode: "extended"
   };
 
-  //POPULATE DB WITH NEW TWEET
   T.get("search/tweets", params, function(err, data, response) {
     if (err) {
     } else {
@@ -82,6 +81,7 @@ const getTweets = (topic = "#1917", howMany = 1) => {
       let text = JSON.parse(response.body).statuses[0].full_text;
       let limitNumber = response.headers["x-rate-limit-remaining"];
 
+      //populate db with new tweet
       insertNewTweet(text, topic);
       //db.close();
     }

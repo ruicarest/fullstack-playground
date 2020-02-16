@@ -37,13 +37,28 @@ const insertNewTweet = async (text, topic = "none") => {
     text: text,
     topic: topic
   });
+
+  console.log("New tweet saved on DB: " + text);
+
   await newTweet.save();
 };
 
-app.get("/user/", (req, res) => {
-  getTweets();
-  console.log("Received GET /user/");
-  res.send(JSON.stringify("Hello World!"));
+const fetchNewTweet = async () => {
+  let tweet = await models.Tweet.findTweet();
+  console.log("Fetched new tweet: " + tweet);
+
+  return tweet;
+};
+
+app.get("/user/", async (req, res) => {
+  var p1 = new Promise(resolve => resolve(getTweetsFromTwitter()))
+    .then(() => fetchNewTweet())
+    .catch(error => console.log(error))
+    .then(newTweet => {
+      console.log("sent answer to GET/");
+      res.send(JSON.stringify(newTweet));
+    })
+    .catch(error => console.log(error));
 });
 
 //Create
@@ -72,18 +87,23 @@ const getTweetsFromTwitter = (topic = "#1917", howMany = 3) => {
     if (err) {
     } else {
       //save response for debugging purposes
-      writeFile("response.json", JSON.stringify(response), function(err) {
+      writeFile("response.json", response.body, function(err) {
         if (err) {
           console.log(err);
         }
       });
 
-      let text = JSON.parse(response.body).statuses[0].full_text;
-      let limitNumber = response.headers["x-rate-limit-remaining"];
+      var limitNumber;
+      for (let i = 0; i < params.count; i++) {
+        let text = JSON.parse(response.body).statuses[i].full_text;
+        limitNumber = response.headers["x-rate-limit-remaining"];
 
-      //populate db with new tweet
-      insertNewTweet(text, topic);
-      //db.close();
+        //populate db with new tweet
+        insertNewTweet(text, params.q);
+        //db.close();
+      }
+
+      console.log("LimitNumber: " + limitNumber);
     }
   });
 };
